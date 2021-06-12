@@ -1,0 +1,58 @@
+avatar-input {
+  width: 200px;
+  height: 200px;
+  display: block;
+  position: relative;
+  background-color: #eee;
+  border-radius: 50%;
+}
+
+avatar-input canvas,
+avatar-input video {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+avatar-input button {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 100px;
+  transform: translate(50%, -50%);
+  background-color: red;
+  border: none;
+  appearance: none;
+}
+
+avatar-input[data-state="captured"] button {
+  background-color: gray;
+}
+
+avatar-input[data-state="captured"] button:before,
+avatar-input[data-state="captured"] button:after {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 1px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  background-color: white;
+}
+
+avatar-input[data-state="captured"] button:before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+avatar-input[data-state="captured"] button:after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}

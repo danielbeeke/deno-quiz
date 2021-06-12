@@ -1,0 +1,14 @@
+{
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "serve": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^4.3.2",
+    "uhtml": "^2.7.3",
+    "universal-router": "^9.0.1",
+    "vite": "^2.3.7"
+  }
+}

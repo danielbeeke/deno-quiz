@@ -1,0 +1,24 @@
+html {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 300px;
+  margin-inline: auto;
+}
+
+.profile.card img {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  margin-inline: auto;
+  object-fit: cover;
+  border-radius: 50%;
+}
