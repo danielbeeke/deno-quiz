@@ -10,7 +10,7 @@ export class Route {
     return this.template(context)
   }
 
-  template (context: RouterContext): Renderable {
+  async template (context: RouterContext): Promise<Renderable> {
     return html`Please implement template for the route: ${context.route.name}`
   }
 }

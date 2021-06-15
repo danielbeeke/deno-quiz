@@ -4,6 +4,7 @@ import { t } from '../core/Translate'
 import { Route } from './Route'
 import { goTo } from '../core/goto'
 import { connection } from '../core/connection'
+import { Profile as userProfile } from '../core/Profile'
 
 export default class Home extends Route {
   public name = 'home'
@@ -13,16 +14,11 @@ export default class Home extends Route {
   protected errorMessage = ''
   protected file: File | null = null
 
-  template () {
-    const { name, avatar } = localStorage.profile ? JSON.parse(localStorage.profile) : {}
+  async template () {
+    const quizzes = await connection.getQuizzes() ?? []
 
     const setQuizName = ({ target }: { target: HTMLInputElement }) => {
       this.quizName = target.value
-    }
-
-    const gotoQuiz = (event: Event) => {
-      event.preventDefault()
-      goTo('quiz', { name: this.quizName })
     }
 
     const saveQuizFile = ({ target }: { target: HTMLInputElement }) => {
@@ -35,6 +31,7 @@ export default class Home extends Route {
       if (!this.file) return
       const quizFileContents = await this.file.text()
       const quizData = JSON.parse(quizFileContents)
+      
       try {
         await connection.createQuiz(this.quizName, quizData)
         this.errorMessage = ''
@@ -49,12 +46,18 @@ export default class Home extends Route {
     return html`
       <h1>Welcome to ${config.name}!</h1>
 
-      ${name ? html`
-        <a href="/profile" class="profile card">
-          <h3>${name}</h3>
-          <img src=${avatar}>
-        </a>
-      ` : null}
+      <a href="/profile" class="profile card">
+        <img class="avatar" src=${userProfile.avatar} />
+        <h3 class="name">${userProfile.name}</h3>
+      </a>
+
+      <div class="quizzes-list">
+        <h2>${t`Quizzes`}</h2>
+
+        ${quizzes.map(quiz => html`
+          <a href=${'/quiz/' + quiz.room}>${quiz.title}</a>
+        `)}
+      </div>
 
       <form class="create-quiz-form" onsubmit=${createQuiz}>
         <h2>${t`I want to create a quiz`}</h2>
@@ -63,19 +66,10 @@ export default class Home extends Route {
         <input type="text" pattern="[a-zA-Z]{4,10}" onkeyup=${setQuizName} />
 
         <label>${t`Quiz questions`}</label>
-        <input type="file" accept=".quiz" onchange=${saveQuizFile}>
+        <input type="file" accept=".quiz.json" onchange=${saveQuizFile}>
 
         <button>Create quiz</button>
         ${this.errorMessage ? html`<div class="error-message">${this.errorMessage}</div>` : null}
-      </form>
-
-      <form class="goto-quiz-form" onsubmit=${gotoQuiz}>
-        <h2>${t`I have received a quiz name`}</h2>
-
-        <label>${t`Quiz name`}</label>
-        <input type="text" pattern="[a-zA-Z]{4,10}" onkeyup=${setQuizName} />
-
-        <button>Go to quiz</button>
       </form>
     `
   }

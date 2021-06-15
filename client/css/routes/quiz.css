@@ -1,0 +1,76 @@
+body[data-route="quiz"] .choices {
+  display: flex;
+  gap: 60px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: stretch;
+  flex: 3 1 auto;
+  align-content: center;
+  position: relative;
+  padding-inline: 120px;
+}
+
+body[data-route="quiz"] .choice {
+  flex: 40%;
+  background: #FFFFFF 0% 0% no-repeat padding-box;
+  box-shadow: 0px 3px 10px var(--color-black);
+  border-radius: 60px;
+  appearance: none;
+  border: 3px solid white;
+  transition: all .2s ease-in-out;
+  font-size: 30px;
+  cursor: pointer;
+  position: relative;
+  line-height: 54px;
+  color: var(--color-text);
+}
+
+body[data-route="quiz"] .choice:hover {
+  border-color: var(--color-primary);
+}
+
+body[data-route="quiz"] .choice:focus {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+body[data-route="quiz"] .choice:not([has-image]) {
+  height: 110px;
+}
+
+body[data-route="quiz"] .choice:not([has-image]) .index::after {
+  content: '.';
+}
+
+body[data-route="quiz"] .choice[has-image]  {
+  height: 50%;
+  border-radius: 10px;
+  border: none;
+}
+
+body[data-route="quiz"] .choice[has-image] .image {
+  width: 100%;
+  object-fit: cover;
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 10px;
+  height: 100%;
+}
+
+body[data-route="quiz"] .choice[has-image] .index {
+  position: absolute;
+  left: -10px;
+  top: -10px;
+  z-index: 1;
+  background-color: white;
+  box-shadow: 0px 3px 6px var(--color-black);
+  padding: 10px 20px;
+  transition: all .2s ease-in-out;
+}
+
+body[data-route="quiz"] .choice[has-image]:hover .index {
+  background-color: var(--color-primary);
+  color: white;
+}

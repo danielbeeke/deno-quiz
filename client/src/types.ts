@@ -11,5 +11,28 @@ export interface Error {
 export type Route = {
   name: string,
   path: string,
-  action: (context: RouterContext) => Renderable
+  action: (context: RouterContext) => Promise<Renderable>
+}
+
+export type Quiz = {
+  state: string
+  title: string
+  host: string
+  room: string
+  score: { [key: string]: number }
+  currentQuestion: number,
+  members: Array<string>
+  questions: Array<{
+    title?: string
+    image?: string
+    answers: {
+      [key: string]: number
+    }
+    choices: Array<{
+      title?: string
+      image?: string
+      correct?: boolean  
+    }>
+  }>
+  profiles: Array<{ name: string, avatar: string, uuid: string }>
 }

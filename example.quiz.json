@@ -1,0 +1,23 @@
+{
+  "title": "Example Quiz",
+  "questions": [
+    {
+      "title": "What is the capital of the Netherlands?",
+      "choices": [
+        { "title": "Rotterdam" },
+        { "title": "Twente" },
+        { "title": "Groningen" },
+        { "title": "Amsterdam", "correct": true }
+      ]
+    },
+    {
+      "title": "Which of these dogs is a boxer?",
+      "choices": [
+        { "image": "https://kb.rspca.org.au/wp-content/uploads/2018/11/golder-retriever-puppy.jpeg" },
+        { "image": "https://i.insider.com/5484d9d1eab8ea3017b17e29?width=600&format=jpeg&auto=webp" },
+        { "image": "https://i.insider.com/5484d9d1eab8ea3017b17e29?width=600&format=jpeg&auto=webp" },
+        { "image": "https://media-be.chewy.com/wp-content/uploads/2021/04/16140537/Boxer_Feature-Image.jpg", "correct": true }
+      ]
+    }
+  ]
+}

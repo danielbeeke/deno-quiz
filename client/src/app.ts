@@ -1,7 +1,7 @@
 import { render, Renderable } from 'uhtml'
 import { router } from './core/Router'
 import { interceptProfile } from './helpers/interceptProfile'
-import './css/style.css'
+import { interceptHrefs } from './helpers/interceptHrefs'
 
 export const renderApp = async () => {
   interceptProfile()
@@ -12,3 +12,4 @@ export const renderApp = async () => {
 window.addEventListener('popstate', renderApp)
 document.body.addEventListener('render', renderApp)
 renderApp()
+interceptHrefs()

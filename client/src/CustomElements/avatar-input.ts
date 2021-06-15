@@ -1,5 +1,3 @@
-import '../css/avatar-input.css'
-
 class AvatarInput extends HTMLElement {
 
   protected video: HTMLVideoElement = document.createElement('video')
@@ -26,10 +24,10 @@ class AvatarInput extends HTMLElement {
     
     await this.init()
     const value = this.getAttribute('value')
-    if (value && this.context) {
+    if (value) {
       const img = new Image
       img.onload = () => {
-        this.context.drawImage(img, 0, 0), 200, 200;
+        if (this.context) this.context.drawImage(img, 0, 0), 200, 200;
         this.dataset.state = 'captured'
         this.video.style.display = 'none'  
       };
@@ -44,8 +42,8 @@ class AvatarInput extends HTMLElement {
 
       if (this.dataset.state === 'capturing' && this.context) {
         this.context.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height)
-        this.video.style.display = 'none'  
-        this.video?.srcObject?.getVideoTracks().forEach(track => track.stop())
+        this.video.style.display = 'none';
+        (<MediaStream>this.video.srcObject).getVideoTracks().forEach(track => track.stop())
         this.canvas.removeAttribute('style')
         this.dataset.state = 'captured'
 
@@ -65,13 +63,11 @@ class AvatarInput extends HTMLElement {
     });
   }
 
-  capture () {
-    
-  }
-
   async init () {
     if (!this.context || !this.video) return
-    this.video.srcObject = await navigator.mediaDevices.getUserMedia({ video: true })
+    this.video.srcObject = await navigator.mediaDevices.getUserMedia({ video: {
+      width: { min: 100, ideal: 200, max: 200 },
+    }})
     let { width, height } = this.video?.srcObject?.getVideoTracks()[0].getSettings()
     this.cameraWidth = width
     this.cameraHeight = height

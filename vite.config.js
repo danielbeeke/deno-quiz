@@ -1,5 +1,8 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  root: './client'
+  root: './client',
+  server: {
+    https: true
+  }
 })

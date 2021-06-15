@@ -1,0 +1,27 @@
+.profile.card {
+  display: inline-flex;
+  position: relative;
+}
+
+.profile.card .name {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--color-primary);
+  background-color: white;
+  display: inline-block;
+  border-radius: 20px;
+  font-size: 11px;
+  padding: 6px 10px;
+  margin: 0;
+}
+
+.profile.card img {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  margin-inline: auto;
+  object-fit: cover;
+  border-radius: 50%;
+}
