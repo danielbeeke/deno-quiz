@@ -1,5 +1,6 @@
 import { QuizData } from './types.ts'
 import { broadcast } from './helpers/broadcast.ts'
+import { quizzes } from './index.ts'
 
 export class Quiz {
 
@@ -29,6 +30,30 @@ export class Quiz {
     }, [...this.members.values()])
   }
 
+  public restart () {
+    this.state = 'question'
+    this.currentQuestion = 0
+
+    for (const question of Object.values(this.data.questions)) {
+      /** @ts-ignore */
+      question.answers = {}
+    }
+
+    broadcast({
+      command: 'quizStarted',
+      room: this.room,
+    }, [...this.members.values()])
+  }
+
+  public stop () {
+    quizzes.delete(this.room)
+
+    broadcast({
+      command: 'quizStopped',
+      room: this.room,
+    }, [...this.members.values()])
+  }
+
   public nextQuestion () {
     if (this.data.questions[this.currentQuestion + 1]) {
       this.state = 'question'
@@ -43,10 +68,11 @@ export class Quiz {
   
         for (const question of Object.values(this.data.questions)) {
   
-          const correctAnswer = question.choices.find(choice => choice.correct === true)
-          const correctIndex = correctAnswer ? question.choices.indexOf(correctAnswer) : null
-  
-          if (question.answers[member] === correctIndex) score++
+          const correctAnswers = question.choices.filter(choice => choice.correct === true)
+          for (const correctAnswer of correctAnswers) {
+            const correctIndex = correctAnswer ? question.choices.indexOf(correctAnswer) : null
+             if (correctIndex !== null && question.answers[member].includes(correctIndex)) score++  
+          }
         }
   
         this.data.score[member] = score
@@ -63,7 +89,8 @@ export class Quiz {
   public setAnswer (question: number, answer: number, uuid: string) {
     if (!this.data.questions[question]) throw new Error('Missing question')
     if (!this.data.questions[question].answers) this.data.questions[question].answers = {}
-    this.data.questions[question].answers[uuid] = answer
+    if (!this.data.questions[question].answers[uuid]) this.data.questions[question].answers[uuid] = []
+    this.data.questions[question].answers[uuid].push(answer)
 
     broadcast({
       command: 'someoneAnswered',

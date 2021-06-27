@@ -15,10 +15,14 @@ avatar-input button {
   width: 40px;
   height: 40px;
   border-radius: 100px;
-  transform: translate(50%, -50%);
+  transform: translate(50%, -50%) scale(1);
   background-color: red;
   border: none;
   appearance: none;
+}
+
+avatar-input button:hover {
+  transform: translate(50%, -50%) scale(1.2);
 }
 
 avatar-input canvas,

@@ -1,7 +1,11 @@
 @import url('./components/avatar-input.css');
 @import url('./components/profile-card.css');
+@import url('./components/button.css');
+@import url('./components/input.css');
 
 @import url('./routes/quiz.css');
+@import url('./routes/home.css');
+@import url('./routes/profile.css');
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
@@ -10,6 +14,7 @@
   --color-gray: #F5F5F5;
   --color-success: #23BA6E;
   --color-failure: #DD3E4C;
+  --color-info: #a38500;
   --color-black: #00000029;
   --color-text: #242424;
 }
@@ -26,9 +31,11 @@ html {
 }
 
 body {
-  margin: 100px;
-  padding: 80px;
-  gap: 60px;
+  margin-block: 50px;
+  margin-inline: auto;
+  padding: 40px;
+  gap: 30px;
+  max-width: calc(100vw - 100px);
   flex: auto;
   border-radius: 40px;
   display: flex;
@@ -39,7 +46,7 @@ body {
 
 h1 {
   text-align: center;
-  font-size: 60px;
+  font-size: 40px;
   line-height: 71px;
   color: var(--color-primary);
   margin: 0;
@@ -52,94 +59,25 @@ h1 {
 * {
   box-sizing: border-box;
 }
-/* 
+
 form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-width: 300px;
-  margin-inline: auto;
-}
-
-.profile.card {
-  display: inline-flex;
-  position: relative;
-}
-
-.profile.card .name {
-  position: absolute;
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--color-primary);
-  display: inline-block;
-  border-radius: 20px;
-  font-size: 11px;
-  padding: 6px 10px;
-  margin: 0;
-}
-
-.profile.card img {
-  width: 100px;
-  height: 100px;
-  position: relative;
-  margin-inline: auto;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.row {
-  display: flex;
+  justify-content: center;
   gap: 20px;
-  margin-bottom: 20px;
-  align-items: center;
-  align-items: stretch;
-  height: auto;
-  flex-wrap: wrap;
-  flex: 1 1 auto;
 }
 
-.choice {
-  padding: 0;
-  border: 0;
-  border-radius: 20px;
-  appearance: none;
-  flex: 1 1 30%;
-  height: 50%;
+label {
+  font-weight: bold;
+  font-size: 20px;
 }
 
-.progress-bar {
-  height: 20px;
-  flex: 1 1 auto;
-  background: #eee;
-  border-radius: 20px;
-  overflow: hidden;
+form .button,
+form label {
+  margin-top: 30px;
 }
 
-.progress-bar:after {
-  content: '';
-  display: block;
-  background: var(--color-failure);
-  height: 100%;
-  width: var(--progress);
+p {
+  font-size: 18px;
+  max-width: 400px;
 }
-
-.correct .progress-bar:after{
-  background: var(--color-success);
-}
-
-h1 {
-  margin: 0;
-}
-
-.choices .image {
-  max-width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 20px;
-}
-
-.choices.result .image {
-  width: 100px;
-  height: 100px;
-} */

@@ -26,12 +26,13 @@ export type Quiz = {
     title?: string
     image?: string
     answers: {
-      [key: string]: number
+      [key: string]: Array<number>
     }
     choices: Array<{
       title?: string
       image?: string
       correct?: boolean  
+      explainer?: string
     }>
   }>
   profiles: Array<{ name: string, avatar: string, uuid: string }>

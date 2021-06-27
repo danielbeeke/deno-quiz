@@ -1,42 +1,54 @@
 body[data-route="quiz"] .choices {
   display: flex;
-  gap: 60px;
-  flex-direction: row;
+  gap: 30px;
+  flex-direction: column;
   flex-wrap: wrap;
   justify-content: stretch;
   flex: 3 1 auto;
-  align-content: center;
+  align-content: stretch;
   position: relative;
-  padding-inline: 120px;
 }
 
 body[data-route="quiz"] .choice {
-  flex: 40%;
   background: #FFFFFF 0% 0% no-repeat padding-box;
   box-shadow: 0px 3px 10px var(--color-black);
   border-radius: 60px;
   appearance: none;
   border: 3px solid white;
   transition: all .2s ease-in-out;
-  font-size: 30px;
-  cursor: pointer;
+  font-size: 26px;
+  line-height: 44px;
+  padding: 10px;
+  align-items: center;
+  display: inline-flex;
+  gap: 10px;
   position: relative;
-  line-height: 54px;
   color: var(--color-text);
 }
 
-body[data-route="quiz"] .choice:hover {
+body[data-route="quiz"] .choices:not(.result) .choice:hover {
   border-color: var(--color-primary);
+  cursor: pointer;
 }
 
-body[data-route="quiz"] .choice:focus {
+body[data-route="quiz"] .choice.selected,
+body[data-route="quiz"] .choices:not(.result) .choice:focus {
   background-color: var(--color-primary);
   color: white;
   border-color: var(--color-primary);
 }
 
-body[data-route="quiz"] .choice:not([has-image]) {
-  height: 110px;
+body[data-route="quiz"] .choice.selected {
+  pointer-events: none;
+}
+
+body[data-route="quiz"] .choices.result {
+  flex-direction: row;
+}
+
+body[data-route="quiz"] .choice:not([has-image]) .index {
+  content: '.';
+  font-weight: bold;
 }
 
 body[data-route="quiz"] .choice:not([has-image]) .index::after {
@@ -59,6 +71,19 @@ body[data-route="quiz"] .choice[has-image] .image {
   height: 100%;
 }
 
+
+body[data-route="quiz"] .result .choice[has-image] .image {
+  width: 120px;
+  position: relative;
+  top: auto;
+  left: auto;
+  height: 120px;
+}
+
+body[data-route="quiz"] .result .choice[has-image] {
+  height: auto;  
+}
+
 body[data-route="quiz"] .choice[has-image] .index {
   position: absolute;
   left: -10px;
@@ -70,7 +95,111 @@ body[data-route="quiz"] .choice[has-image] .index {
   transition: all .2s ease-in-out;
 }
 
-body[data-route="quiz"] .choice[has-image]:hover .index {
+body[data-route="quiz"] .choices:not(.result) .choice[has-image]:hover .index {
   background-color: var(--color-primary);
   color: white;
+}
+
+body[data-route="quiz"] .result .choice {
+  flex: 1 1 100%;
+}
+
+body[data-route="quiz"] .joined {
+  display: flex;
+  gap: 20px;
+}
+
+body[data-route="quiz"] .result .choice .person {
+  border-radius: 50%;
+  display: block;
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border: 5px solid var(--color-gray);
+}
+
+body[data-route="quiz"] .result .choice .person.self {
+  border: 5px solid var(--color-primary);
+}
+
+body[data-route="quiz"] .result .choice .chosen-people {
+  display: flex;
+  gap: 10px;
+  position: relative;
+  z-index: 3;
+  flex: 0 0 70px;
+  margin-bottom: -30px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+body[data-route="quiz"] .result .choice .right {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+body[data-route="quiz"] .result .choice .explainer {
+  color: var(--color-primary);
+}
+
+.progress-bar {
+  width: 100%;
+  flex: 0 0 40px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: var(--color-black);
+  box-shadow: 0px -1px 10px var(--color-black) inset;
+}
+
+.progress-bar:after {
+  content: '';
+  display: block;
+  width: var(--progress);
+  height: 100%;
+  border-radius: 20px;
+  background-color: var(--color-primary);
+}
+
+.wrong .progress-bar:after {
+  background-color: var(--color-failure);
+}
+
+.correct .progress-bar:after {
+  background-color: var(--color-success);
+}
+
+.wrong .index,
+.wrong .title {
+  color: var(--color-failure);
+}
+
+.correct .index,
+.correct .title {
+  color: var(--color-success);
+}
+
+.score-row {
+  gap: 20px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.score-row .progress-bar {
+  flex: 1 1 100%;
+}
+
+.score-row .profile.card img {
+  width: 70px;
+  height: 70px;
+}
+
+.question-image {
+  object-fit: contain;
+  flex: 1 1 auto;
+  max-height: 40%;
 }

@@ -1,6 +1,7 @@
 import { Profile as userProfile, profiles } from '../core/Profile'
 import { cyrb53 } from '../helpers/cyrb53'
 import { Quiz } from '../types'
+import { goTo } from './goto'
 
 class Connection extends EventTarget {
 
@@ -10,7 +11,7 @@ class Connection extends EventTarget {
   constructor (server: string) {
     super()
 
-    this.socket = new WebSocket('wss:' + server)
+    this.socket = new WebSocket((location.protocol === 'https:' ? 'wss:' : 'ws:') + server)
     this.socket.addEventListener('message', (event: MessageEvent) => {
       try {
         const command = JSON.parse(event.data)
@@ -35,7 +36,20 @@ class Connection extends EventTarget {
           }
         }
 
-        if (['someoneAnswered', 'quizStarted', 'proceed'].includes(command.command) && command.room && document.body.dataset.route === 'quiz') {
+        if (['newQuiz'].includes(command.command) && document.body.dataset.route === 'home') {
+          document.body.dispatchEvent(new CustomEvent('render'))
+        }
+
+        if (['quizStopped'].includes(command.command)) {
+          if (document.body.dataset.route === 'quiz') goTo('home')
+          document.body.dispatchEvent(new CustomEvent('render'))
+        }
+
+        if ([
+          'someoneAnswered', 
+          'quizStarted', 
+          'proceed'
+        ].includes(command.command) && command.room && document.body.dataset.route === 'quiz') {
           document.body.dispatchEvent(new CustomEvent('render'))
         }
 
@@ -64,6 +78,14 @@ class Connection extends EventTarget {
 
   nextQuestion (room: string) {
     return this.sendCommand('nextQuestion', { room })
+  }
+
+  restartQuiz (room: string) {
+    return this.sendCommand('restartQuiz', { room })
+  }
+
+  stopQuiz (room: string) {
+    return this.sendCommand('stopQuiz', { room })
   }
 
   getQuizzes () {
@@ -130,4 +152,4 @@ class Connection extends EventTarget {
   }
 }
 
-export const connection = new Connection(`${location.hostname}:4443`)
+export const connection = new Connection(`${location.hostname}:${location.port}/socket`)

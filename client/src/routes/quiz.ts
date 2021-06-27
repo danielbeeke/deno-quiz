@@ -5,10 +5,13 @@ import { connection } from '../core/connection'
 import { Quiz as QuizType } from '../types'
 import { getState } from '../helpers/getState'
 import { Profile as userProfile, profiles } from '../core/Profile'
+import { goTo } from '../core/goto';
 
 type QuizState = {
   quiz: QuizType | null
 }
+
+const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 export default class Quiz extends Route {
   public name = 'quiz'
@@ -30,7 +33,8 @@ export default class Quiz extends Route {
     if (state.quiz.state === 'open') return this.waitingRoom(state)
     if (state.quiz.state === 'question') {
       const question = state.quiz.questions[state.quiz.currentQuestion]
-      return question && question.answers && userProfile.uuid in question.answers ? this.inBetweenScreen(state) : this.question(state)
+      const correctChoices = question.choices.filter(choice => choice.correct)
+      return question && question.answers && userProfile.uuid in question.answers && question.answers[userProfile.uuid]?.length === correctChoices.length ? this.inBetweenScreen(state) : this.question(state)
     }
 
     if (state.quiz.state === 'done') {
@@ -56,7 +60,7 @@ export default class Quiz extends Route {
         ${isHost ? 'Please wait while people join. Start when you want.' : 'Please wait while people join. The host will start the game soon.'}
       </div>
 
-      <div class="members row">
+      <div class="joined">
         ${state.quiz?.members
           .filter(uuid => profiles.has(uuid))
           .map(uuid => {
@@ -73,7 +77,9 @@ export default class Quiz extends Route {
 
       ${isHost ? html`
         <form onsubmit=${startQuiz}>
-          <button>Start quiz</button>
+          <div>
+            <button class="button primary">Start quiz</button>
+          </div>
         </form>
       ` : null}
     `
@@ -89,16 +95,21 @@ export default class Quiz extends Route {
       connection.selectAnswer(state.quiz.room, state.quiz.currentQuestion, index)
     }
 
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
     return html`
-      <h1>${question.title}</h1>
-      <div class="choices">
-        ${[...question.choices.entries()].map(([index, option]) => html`<button class="choice" ?has-title=${option.title} ?has-image=${option.image} class="choice" onclick=${() => selectAnswer(index)}>
-          <span class="index">${alphabet[index]}</span>
-          <span class="title">${option.title}</span>
-          ${option.image ? html`<img class="image" src=${option.image} />` : null}
-        </button>`)}
+    <h1>${state.quiz.currentQuestion + 1}. ${question.title}</h1>
+
+    ${question?.image ? html`<img class="question-image" src=${question?.image} />` : null}
+
+    <div class="choices">
+        ${[...question.choices.entries()].map(([index, option]) => {
+          const isSelected = question.answers?.[userProfile.uuid]?.includes(index)
+
+          return html`<button ?has-title=${option.title} ?has-image=${option.image} class=${`choice ${isSelected ? 'selected' : ''}`} onclick=${() => selectAnswer(index)}>
+            <span class="index">${alphabet[index]}</span>
+            <span class="title">${option.title}</span>
+            ${option.image ? html`<img class="image" src=${option.image} />` : null}
+          </button>`
+        })}
       </div>
     `
   }
@@ -116,25 +127,42 @@ export default class Quiz extends Route {
     }
 
     return html`
-      <h1>${question.title}</h1>
+      <h1>${state.quiz.currentQuestion + 1}. ${question.title}</h1>
 
       <div class="choices result">
       ${[...question.choices.entries()].map(([index, option]) => {
-          const chosenCount = Object.values(question.answers).filter(answer => answer === index).length
+          const chosenCount = Object.values(question.answers).filter(answer => answer.includes(index)).length
           if (!state || !state.quiz) throw new Error('Unknown quiz')
           const chosenPercentage = Math.round(100 / state.quiz.members.length * chosenCount)
 
-          return html`<div class=${option.correct ? 'row correct' : 'row'}>
-            ${option.title}
+          const chosenPeople = Object.entries(question.answers)
+          .filter(([_uuid, answer]) => answer.includes(index))
+          .map(([uuid]) => profiles.get(uuid))
+
+          return html`<div class=${option.correct ? 'choice correct' : 'choice wrong'} ?has-title=${option.title} ?has-image=${option.image}>
+            <span class="index">${alphabet[index]}</span>
             ${option.image ? html`<img class="image" src=${option.image} />` : null}
-            <div class="progress-bar" style=${`--progress: ${chosenPercentage}%`}></div>
+            <span class="title">
+            ${option.title}
+            ${option.explainer ? html`<span class="explainer">${option.explainer}</span>` : null}
+            </span>
+            <div class="right">
+              ${chosenPeople.length ? html`
+                <div class="chosen-people">
+                  ${chosenPeople.map(member => html`
+                    <img class=${`person ${member?.uuid === userProfile.uuid ? 'self' : ''}`} src=${member?.avatar} />
+                  `)}
+                </div>
+              ` : null}
+              <div class="progress-bar" style=${`--progress: ${chosenPercentage}%`}></div>
+            </div>
           </div>`
         })}
       </div>
 
       ${isHost && state.quiz.members.length === Object.values(question.answers).length ? html`
         <form onsubmit=${nextQuestion}>
-          <button>Next question</button>
+          <button class="button primary">${state.quiz.questions.length === state.quiz.currentQuestion + 1 ? 'Finish quiz' : 'Next question'}</button>
         </form>
       ` : null}
 
@@ -143,6 +171,7 @@ export default class Quiz extends Route {
 
   async finished (state: QuizState) {
     if (!state || !state.quiz) throw new Error('Unknown quiz')
+    const isHost = state.quiz?.host === userProfile.uuid
 
     const sortedMembers = state.quiz?.members
     .filter(uuid => profiles.has(uuid))
@@ -153,6 +182,20 @@ export default class Quiz extends Route {
 
     const highScore = state.quiz.score[sortedMembers[0]]
 
+    const restartQuiz = (event: Event) => {
+      event.preventDefault()
+      if (!state || !state.quiz) throw new Error('Unknown quiz')
+      connection.restartQuiz(state.quiz.room)
+    }
+
+    const stopQuiz = async (event: Event) => {
+      event.preventDefault()
+      if (!state || !state.quiz) throw new Error('Unknown quiz')
+      await connection.stopQuiz(state.quiz.room)
+      goTo('home')
+    }
+
+
     return html`
     <h1>${state.quiz.title}</h1>
 
@@ -161,17 +204,32 @@ export default class Quiz extends Route {
         const member = profiles.get(uuid)
         if (!state || !state.quiz || !state.quiz.score) throw new Error('Unknown quiz')
         const score = state.quiz.score[uuid]
-        const correctPercentage = Math.round(100 / state.quiz.questions.length * score)
+
+        let totalPoints = 0
+        for (const question of state.quiz.questions) {
+          totalPoints += question.choices.filter(choice => choice.correct).length
+        }
+
+        const correctPercentage = Math.round(100 / totalPoints * score)
 
         return html`
-        <div class=${`row correct ${highScore === score ? 'winner' : ''}`}>
-          <img class="avatar" src=${member?.avatar} />
-          <h3 class="name">${member?.name}</h3>
-          <div class="progress-bar" style=${`--progress: ${correctPercentage}%`}></div>
+        <div class="${`score-row correct ${highScore === score ? ' winner' : ''}`}">
+          <div class=${`profile card`}>
+            <img class="avatar" src=${member?.avatar} />
+            <h3 class="name">${member?.name}</h3>
+          </div>
+        <div class="progress-bar" style=${`--progress: ${correctPercentage}%`}></div>
         </div>
       `
       })}
     </div>
+
+    ${isHost ? html`
+    <form>
+      <button class="button primary" onclick=${restartQuiz}>Restart quiz</button>
+      <button class="button primary" onclick=${stopQuiz}>Stop quiz</button>
+    </form>
+  ` : null}
 
     `
   }

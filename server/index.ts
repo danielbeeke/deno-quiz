@@ -1,9 +1,9 @@
-import { serveTLS } from "https://deno.land/std@0.98.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.97.0/http/server.ts";
 import {
   acceptWebSocket,
   WebSocket,
-} from "https://deno.land/std@0.98.0/ws/mod.ts";
-
+} from "https://deno.land/std@0.97.0/ws/mod.ts";
+import { serveFile } from "https://deno.land/std@0.97.0/http/file_server.ts";
 import { Quiz } from './Quiz.ts'
 
 import { createQuiz } from './commands/createQuiz.ts'
@@ -14,10 +14,25 @@ import { getQuiz } from './commands/getQuiz.ts'
 import { startQuiz } from './commands/startQuiz.ts'
 import { selectAnswer } from './commands/selectAnswer.ts'
 import { nextQuestion } from './commands/nextQuestion.ts'
+import { restartQuiz } from './commands/restartQuiz.ts'
+import { stopQuiz } from './commands/stopQuiz.ts'
 
 export const quizzes: Map<string, Quiz> = new Map()
 export const profiles: Map<string, unknown> = new Map()
 export const sockets: Set<WebSocket & { id?: string }> = new Set()
+
+async function fileExists(path: string) {
+  try {
+    const stats = await Deno.lstat(path);
+    return stats && stats.isFile;
+  } catch(e) {
+    if (e && e instanceof Deno.errors.NotFound) {
+      return false;
+    } else {
+      throw e;
+    }
+  }
+}
 
 async function handleWs(sock: WebSocket & { id?: string }) {
   try {
@@ -67,6 +82,14 @@ async function handleWs(sock: WebSocket & { id?: string }) {
             resultMessage = nextQuestion(jsonMessage.room, jsonMessage.uuid)
           }
 
+          if (jsonMessage.command === 'restartQuiz' && jsonMessage.room) {
+            resultMessage = restartQuiz(jsonMessage.room, jsonMessage.uuid)
+          }
+
+          if (jsonMessage.command === 'stopQuiz' && jsonMessage.room) {
+            resultMessage = stopQuiz(jsonMessage.room, jsonMessage.uuid)
+          }
+
           if (jsonMessage.command === 'selectAnswer' && jsonMessage.room) {
             resultMessage = selectAnswer(jsonMessage.room, jsonMessage.question, jsonMessage.answer, jsonMessage.uuid)
           }
@@ -105,28 +128,36 @@ async function handleWs(sock: WebSocket & { id?: string }) {
 }
 
 if (import.meta.main) {
-  /** websocket echo server */
-  console.log(`websocket server is running`);
-
   const options = {
     hostname: "0.0.0.0",
-    port: 4443,
-    certFile: "/home/daniel/Development/certs/localhost.pem",
-    keyFile: "/home/daniel/Development/certs/localhost-key.pem",
+    port: 8080
   };
 
-  for await (const req of serveTLS(options)) {
+  console.log(`websocket server is running on ${options.port}`);
+
+  for await (const req of serve(options)) {
     const { conn, r: bufReader, w: bufWriter, headers } = req;
-    acceptWebSocket({
-      conn,
-      bufReader,
-      bufWriter,
-      headers,
-    })
-      .then(handleWs)
-      .catch(async (err) => {
-        console.error(`failed to accept websocket: ${err}`);
-        await req.respond({ status: 400 });
-      });
+
+    if (req.url === '/socket') {
+      acceptWebSocket({
+        conn,
+        bufReader,
+        bufWriter,
+        headers,
+      })
+        .then(handleWs)
+        .catch(async (err: Error) => {
+          console.error(`failed to accept websocket: ${err}`);
+          await req.respond({ status: 400 });
+        });
+    }
+    else {
+      let path = `${Deno.cwd()}/client/dist${req.url}`;
+      if (!await fileExists(path)) path = `${Deno.cwd()}/client/dist/index.html`;
+
+      const content = await serveFile(req, path);
+      req.respond(content);
+      continue;
+    }
   }
 }

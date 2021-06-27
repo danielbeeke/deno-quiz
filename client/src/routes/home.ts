@@ -52,25 +52,31 @@ export default class Home extends Route {
       </a>
 
       <div class="quizzes-list">
-        <h2>${t`Quizzes`}</h2>
+        <h2>${t`Running quizzes list`}</h2>
 
         ${quizzes.map(quiz => html`
-          <a href=${'/quiz/' + quiz.room}>${quiz.title}</a>
+          <a class="quiz-link" href=${'/quiz/' + quiz.room}>${quiz.title}</a>
         `)}
+
+        ${quizzes.length === 0 ? html`
+        <p>- <br><br>Nobody has created a quiz yet, create one yourself or wait for your host to create one.</p>
+        ` : null}
       </div>
 
-      <form class="create-quiz-form" onsubmit=${createQuiz}>
-        <h2>${t`I want to create a quiz`}</h2>
+      <div class="create-quiz-form">
+        <form onsubmit=${createQuiz}>
+          <h2>${t`I want to create a quiz`}</h2>
 
-        <label>${t`Quiz name`}</label>
-        <input type="text" pattern="[a-zA-Z]{4,10}" onkeyup=${setQuizName} />
+          <label>${t`Quiz name`}</label>
+          <input type="text" pattern="[a-zA-Z]{4,10}" onkeyup=${setQuizName} />
 
-        <label>${t`Quiz questions`}</label>
-        <input type="file" accept=".quiz.json" onchange=${saveQuizFile}>
+          <label>${t`Quiz questions`}</label>
+          <input type="file" accept=".quiz.json" onchange=${saveQuizFile}>
 
-        <button>Create quiz</button>
-        ${this.errorMessage ? html`<div class="error-message">${this.errorMessage}</div>` : null}
-      </form>
+          <button class="button primary">Create quiz</button>
+          ${this.errorMessage ? html`<div class="error-message">${this.errorMessage}</div>` : null}
+        </form>
+      </div>
     `
   }
 }

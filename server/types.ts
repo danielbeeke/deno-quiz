@@ -3,7 +3,7 @@ export type QuizData = {
   score: { [key: string]: number },
   questions: Array<{ 
     title: string, 
-    answers: { [key: string]: number }, 
+    answers: { [key: string]: Array<number> }, 
     choices: Array<{ title?: string, image?: string, correct?: boolean }>
   }>
 }
