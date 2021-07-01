@@ -4,6 +4,7 @@ import { t } from '../core/Translate'
 import { Route } from './Route'
 import { connection } from '../core/connection'
 import { Profile as userProfile } from '../core/Profile'
+/** @ts-ignore */
 import FullScreenIcon from '../../images/fullscreen.svg?url'
 import { stringToColor } from '../helpers/stringToColor'
 

@@ -7,12 +7,16 @@ class Connection extends EventTarget {
 
   protected socket: WebSocket
   protected uuid: string = ''
+  protected reconnectTimeout: Number = 0
 
   constructor (server: string) {
     super()
+    this.socket = this.connect(server)
+  }
 
-    this.socket = new WebSocket((location.protocol === 'https:' && location.port !== '3000' ? 'wss:' : 'ws:') + server)
-    this.socket.addEventListener('message', (event: MessageEvent) => {
+  connect (server: string) {
+    let socket = new WebSocket((location.protocol === 'https:' && location.port !== '3000' ? 'wss:' : 'ws:') + server)
+    socket.addEventListener('message', (event: MessageEvent) => {
       try {
         const command = JSON.parse(event.data)
 
@@ -59,9 +63,19 @@ class Connection extends EventTarget {
       }
     })
 
-    this.socket.addEventListener('open', () => {
+    socket.addEventListener('close', () => {
+      setTimeout(() => {
+        console.log('reconnecting')
+        this.socket = this.connect(server)
+      }, 1000);
+    })
+
+    socket.addEventListener('open', () => {
+      console.log('connected')
       this.saveProfile(userProfile.get())
     })
+
+    return socket
   }
 
   createQuiz (name: string, data: object, password: string | null = null) {

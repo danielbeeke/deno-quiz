@@ -60,8 +60,11 @@ export default class Quiz extends Route {
     if (state?.quiz?.require_sharepoint && state?.quiz?.sharepoint_image) {
       // window.location = state?.quiz?.require_sharepoint
       const testImage = document.createElement('img')
-      testImage.onerror = (error: Error) => {
-        window.location.replace(state?.quiz?.require_sharepoint ?? '')
+      testImage.onerror = () => {
+        if (!localStorage.triedSharepoint) {
+          localStorage.setItem('triedSharepoint', 'true')
+          window.location.replace(state?.quiz?.require_sharepoint ?? '')  
+        }
       }
 
       testImage.src = state?.quiz?.sharepoint_image
