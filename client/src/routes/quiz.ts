@@ -9,6 +9,10 @@ import { stringToColor } from '../helpers/stringToColor'
 import { Profile as userProfile, profiles } from '../core/Profile'
 import { goTo } from '../core/goto';
 import { t } from '../core/Translate'
+/** @ts-ignore */
+import doneMobile from '../../images/done-mobile.mp4'
+/** @ts-ignore */
+import doneDesktop from '../../images/done-desktop.mp4'
 
 type QuizState = {
   quiz: QuizType | null
@@ -25,6 +29,7 @@ export default class Quiz extends Route {
 
   async template (context: RouterContext) {
     const state: QuizState = getState(this, { quiz: null, passwordTries: 0 })
+    document.body.classList.remove('finished')
 
     try {
       const password = sessionStorage.getItem('quiz-' + context.params.name) ?? ''
@@ -268,8 +273,12 @@ export default class Quiz extends Route {
 
     const highScore = totalScore[sortedMembers[0]]
 
+    document.body.classList.add('finished')
+
     return html`
     <h1>${state.quiz.title} - ${state.quiz.questions.length} questions</h1>
+
+    <video class="background-video" loop autoplay src=${window.outerWidth < window.outerHeight ? doneMobile : doneDesktop} />
 
     <div class="members">
       ${sortedMembers.map(uuid => {
