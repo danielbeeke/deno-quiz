@@ -7,6 +7,7 @@ import { Profile as userProfile } from '../core/Profile'
 /** @ts-ignore */
 import FullScreenIcon from '../../images/fullscreen.svg?url'
 import { stringToColor } from '../helpers/stringToColor'
+import { goTo } from '../core/goto'
 
 export default class Home extends Route {
   public name = 'home'
@@ -64,6 +65,10 @@ export default class Home extends Route {
           <img onload="SVGInject(this)" src=${FullScreenIcon}>
           ${document.fullscreenElement !== null ? t`Close fullscreen` : t`Make fullscreen`}
         </a>
+
+        <a class="button secondary small" onclick=${() => goTo('create')}>
+        Create quiz
+      </a>
 
 
     `

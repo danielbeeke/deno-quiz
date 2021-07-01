@@ -82,6 +82,32 @@
   }
 }
 
+.score-row {
+  margin-bottom: 20px;
+
+  .top {
+    gap: 10px;
+    align-items: center;
+    display: flex;
+    margin-bottom: 5px;
+  }
+
+  .user {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+
+    .name {
+      font-size: 16px;
+    }
+
+    .avatar {
+      height: 40px;
+      width: 40px;  
+    }
+  }
+}
+
 .choice.button {
   white-space: initial;
   font-size: 16px;

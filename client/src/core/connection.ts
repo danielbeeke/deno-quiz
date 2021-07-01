@@ -1,7 +1,9 @@
 import { Profile as userProfile, profiles } from '../core/Profile'
 import { cyrb53 } from '../helpers/cyrb53'
+import { getState } from '../helpers/getState'
 import { Quiz } from '../types'
 import { goTo } from './goto'
+import { routes } from '../routes/routes'
 
 class Connection extends EventTarget {
 
@@ -45,7 +47,14 @@ class Connection extends EventTarget {
         }
 
         if (['quizStopped'].includes(command.command)) {
-          if (document.body.dataset.route === 'quiz') goTo('home')
+          if (document.body.dataset.route === 'quiz') {
+            sessionStorage.removeItem('quiz-' + command.room)
+            const quizRoute = routes.find(route => route.name === 'quiz')
+
+            const state = getState(quizRoute, { quiz: null })
+            state.quiz = null
+            goTo('home')
+          }
           document.body.dispatchEvent(new CustomEvent('render'))
         }
 

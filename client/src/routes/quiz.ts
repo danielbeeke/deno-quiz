@@ -58,7 +58,6 @@ export default class Quiz extends Route {
     }
 
     if (state?.quiz?.require_sharepoint && state?.quiz?.sharepoint_image) {
-      // window.location = state?.quiz?.require_sharepoint
       const testImage = document.createElement('img')
       testImage.onerror = () => {
         if (!localStorage.triedSharepoint) {
@@ -265,12 +264,16 @@ export default class Quiz extends Route {
 
         return html`
         <div class="${`score-row correct ${highScore === score ? ' winner' : ''}`}">
-          <div class=${`profile card`}>
-            <h3 class="name">${member?.name}</h3>
-          </div>
 
-          <h3>${state.quiz.score[uuid]} of ${totalPoints} points</h3>
+        <div class="top">
 
+        <div class="user" style=${`--profile-color: ${stringToColor(member?.name ?? '')}`}>
+          <div class="avatar">${member?.name.substr(0, 1)}</div>
+          <span class="name">${member?.name?.split(' ')[0]}</span>
+        </div>
+
+            <span class="user-points">${state.quiz.score[uuid]} of ${totalPoints} points</span>
+  </div>
         <div class="progress-bar" style=${`--progress: ${correctPercentage}%`}></div>
         </div>
       `
