@@ -1,0 +1,84 @@
+:root {
+  --color-primary: #5545D0;
+  --color-secondary: #1e5269;
+  --color-gray: #F5F5F5;
+  --color-gray-medium: #b9b9b9;
+  --color-gray-dark: #333333;
+  --color-success: #23BA6E;
+  --color-failure: #830913;
+  --color-info: #a38500;
+  --color-black: #000029;
+  --color-text: #242424;
+}
+
+$tablet: 420px;
+$desktop: 1000px;
+
+@import './components/avatar-input';
+@import './components/profile-card';
+@import './components/button';
+@import './components/input';
+@import './components/progress-bar';
+@import './components/controls';
+
+@import './routes/quiz';
+@import './routes/home';
+@import './routes/profile';
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+html {
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-primary);
+  padding: 0;
+  margin: 0;
+  display: flex;
+  min-height: 100%;
+}
+
+body {
+  margin: 10px;
+  padding: 20px;
+  gap: 30px;
+  flex: auto;
+  border-radius: 40px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-gray);
+  box-shadow: 0px 3px 6px var(--color-black);
+}
+
+h1, h2, h3 {
+  text-align: center;
+  color: var(--color-primary);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+hr {
+  width: 100%;
+  border: none;
+  border-bottom: 2px dashed var(--color-gray-medium);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  max-width: 500px;
+  margin-inline: auto;
+}
+
+label {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+p {
+  text-align: center;
+}

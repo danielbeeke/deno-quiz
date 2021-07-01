@@ -1,11 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import { connection } from '../core/connection'
 
-export const profiles: Map<string, { uuid: string, name: string, avatar: string }> = new Map()
+export const profiles: Map<string, { uuid: string, name: string }> = new Map()
 
 class ProfileManager {
   public name: string = ''
-  public avatar: string = ''
   public uuid: string = ''
 
   constructor () {
@@ -13,7 +12,6 @@ class ProfileManager {
 
     if (profile) {
       this.name = profile.name
-      this.avatar = profile.avatar
       this.uuid = profile.uuid
     }
 
@@ -27,7 +25,6 @@ class ProfileManager {
   get () {
     return {
       name: this.name,
-      avatar: this.avatar,
       uuid: this.uuid
     }
   }

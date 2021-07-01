@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite'
 import fs from 'fs'
+import svgLoader from 'vite-svg-loader'
 
 export default defineConfig({
+  plugins: [svgLoader()],
   root: './client',
   server: {
     https: {

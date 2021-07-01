@@ -5,7 +5,7 @@ export const interceptHrefs = () => {
     if (element) {
       const href = element.getAttribute('href')
   
-      if (href[0] === '/') {
+      if (href && href[0] === '/') {
         event.preventDefault()
         history.pushState(null, '', href)
         document.body.dispatchEvent(new CustomEvent('render'))

@@ -1,7 +1,6 @@
 import { html } from 'uhtml'
 import { Route } from './Route'
 import { t } from '../core/Translate'
-import '../CustomElements/avatar-input.ts'
 import { goTo } from '../core/goto'
 import { Profile as userProfile } from '../core/Profile'
 
@@ -15,10 +14,6 @@ export default class Profile extends Route {
       userProfile.name = target.value
     }
 
-    const setAvatar = (event: Event) => {
-      userProfile.avatar = (event as CustomEvent).detail
-    }
-
     const saveProfile = (event: Event) => {
       event.preventDefault()
       userProfile.save()
@@ -29,9 +24,6 @@ export default class Profile extends Route {
       <h1>Hi, nice to meet you!</h1>
 
       <form onsubmit=${saveProfile}>
-        
-        <label>${t`Your avatar`}</label>
-        <avatar-input value=${userProfile.avatar} oncapture=${setAvatar} />
 
         <label>${t`Your name`}</label>
         <input type="text" .value=${userProfile.name} onkeyup=${setProfileName} />

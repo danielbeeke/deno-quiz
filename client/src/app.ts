@@ -2,6 +2,8 @@ import { render, Renderable } from 'uhtml'
 import { router } from './core/Router'
 import { interceptProfile } from './helpers/interceptProfile'
 import { interceptHrefs } from './helpers/interceptHrefs'
+import '../scss/style.scss'
+import './helpers/svg-inject.js'
 
 export const renderApp = async () => {
   interceptProfile()

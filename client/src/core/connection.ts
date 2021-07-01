@@ -11,7 +11,7 @@ class Connection extends EventTarget {
   constructor (server: string) {
     super()
 
-    this.socket = new WebSocket((location.protocol === 'https:' ? 'wss:' : 'ws:') + server)
+    this.socket = new WebSocket((location.protocol === 'https:' && location.port !== '3000' ? 'wss:' : 'ws:') + server)
     this.socket.addEventListener('message', (event: MessageEvent) => {
       try {
         const command = JSON.parse(event.data)
@@ -64,8 +64,8 @@ class Connection extends EventTarget {
     })
   }
 
-  createQuiz (name: string, data: object) {
-    return this.sendCommand('createQuiz', { name, data })
+  createQuiz (name: string, data: object, password: string | null = null) {
+    return this.sendCommand('createQuiz', { name, data, password })
   }
 
   saveProfile (profile: {}) {
@@ -78,6 +78,10 @@ class Connection extends EventTarget {
 
   nextQuestion (room: string) {
     return this.sendCommand('nextQuestion', { room })
+  }
+
+  previousQuestion (room: string) {
+    return this.sendCommand('previousQuestion', { room })
   }
 
   restartQuiz (room: string) {
@@ -93,8 +97,8 @@ class Connection extends EventTarget {
     return <Promise<Array<{ room: string, title: string }>>> result
   }
 
-  enterQuiz (room: string) {
-    const result: unknown = this.sendCommand('enterQuiz', { room })
+  enterQuiz (room: string, password: string = '') {
+    const result: unknown = this.sendCommand('enterQuiz', { room, password })
     return <Promise<Quiz | null>> result
   }
 
@@ -152,4 +156,4 @@ class Connection extends EventTarget {
   }
 }
 
-export const connection = new Connection(`${location.hostname}:${location.port}/socket`)
+export const connection = new Connection(`${location.hostname}:${location.port === '3000' ? '8080' : location.port}/socket`)

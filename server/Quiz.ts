@@ -8,13 +8,15 @@ export class Quiz {
   public data: QuizData
   public hostUuid: string
   public room: string
+  public password: string
   public members: Set<string> = new Set()
   public currentQuestion = -1
 
-  constructor (data: QuizData, hostUuid: string, room: string) {
+  constructor (data: QuizData, hostUuid: string, room: string, password: string = '') {
     this.data = data
     this.hostUuid = hostUuid
     this.room = room
+    this.password = password
   }
 
   public addMember (uuid: string) {
@@ -54,6 +56,18 @@ export class Quiz {
     }, [...this.members.values()])
   }
 
+  public previousQuestion () {
+    if (this.data.questions[this.currentQuestion - 1]) {
+      this.state = 'question'
+      this.currentQuestion--
+    }
+
+    broadcast({
+      command: 'proceed',
+      room: this.room,
+    }, [...this.members.values()])
+  }
+
   public nextQuestion () {
     if (this.data.questions[this.currentQuestion + 1]) {
       this.state = 'question'
@@ -67,11 +81,10 @@ export class Quiz {
         let score = 0
   
         for (const question of Object.values(this.data.questions)) {
-  
           const correctAnswers = question.choices.filter(choice => choice.correct === true)
           for (const correctAnswer of correctAnswers) {
             const correctIndex = correctAnswer ? question.choices.indexOf(correctAnswer) : null
-             if (correctIndex !== null && question.answers[member].includes(correctIndex)) score++  
+             if (correctIndex !== null && question.answers?.[member].includes(correctIndex)) score++  
           }
         }
   

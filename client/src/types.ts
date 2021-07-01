@@ -17,6 +17,8 @@ export type Route = {
 export type Quiz = {
   state: string
   title: string
+  require_sharepoint?: string
+  sharepoint_image?: string
   host: string
   room: string
   score: { [key: string]: number }
@@ -25,6 +27,7 @@ export type Quiz = {
   questions: Array<{
     title?: string
     image?: string
+    video?: string
     answers: {
       [key: string]: Array<number>
     }
@@ -35,5 +38,5 @@ export type Quiz = {
       explainer?: string
     }>
   }>
-  profiles: Array<{ name: string, avatar: string, uuid: string }>
+  profiles: Array<{ name: string, uuid: string }>
 }

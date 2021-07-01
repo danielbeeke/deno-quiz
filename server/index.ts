@@ -14,6 +14,7 @@ import { getQuiz } from './commands/getQuiz.ts'
 import { startQuiz } from './commands/startQuiz.ts'
 import { selectAnswer } from './commands/selectAnswer.ts'
 import { nextQuestion } from './commands/nextQuestion.ts'
+import { previousQuestion } from './commands/previousQuestion.ts'
 import { restartQuiz } from './commands/restartQuiz.ts'
 import { stopQuiz } from './commands/stopQuiz.ts'
 
@@ -55,7 +56,7 @@ async function handleWs(sock: WebSocket & { id?: string }) {
           let resultMessage = null
 
           if (jsonMessage.command === 'createQuiz' && jsonMessage.name && jsonMessage.data) {
-            resultMessage = createQuiz(jsonMessage.name, jsonMessage.data, jsonMessage.uuid)
+            resultMessage = createQuiz(jsonMessage.name, jsonMessage.data, jsonMessage.password, jsonMessage.uuid)
           }
 
           if (jsonMessage.command === 'saveProfile' && jsonMessage.name && jsonMessage.avatar && jsonMessage.uuid) {
@@ -67,7 +68,7 @@ async function handleWs(sock: WebSocket & { id?: string }) {
           }
 
           if (jsonMessage.command === 'enterQuiz' && jsonMessage.room) {
-            resultMessage = enterQuiz(jsonMessage.room, jsonMessage.uuid)
+            resultMessage = enterQuiz(jsonMessage.room, jsonMessage.password, jsonMessage.uuid)
           }
 
           if (jsonMessage.command === 'getQuiz' && jsonMessage.room) {
@@ -80,6 +81,10 @@ async function handleWs(sock: WebSocket & { id?: string }) {
 
           if (jsonMessage.command === 'nextQuestion' && jsonMessage.room) {
             resultMessage = nextQuestion(jsonMessage.room, jsonMessage.uuid)
+          }
+
+          if (jsonMessage.command === 'previousQuestion' && jsonMessage.room) {
+            resultMessage = previousQuestion(jsonMessage.room, jsonMessage.uuid)
           }
 
           if (jsonMessage.command === 'restartQuiz' && jsonMessage.room) {
