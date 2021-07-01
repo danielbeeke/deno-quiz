@@ -242,15 +242,8 @@ export default class Quiz extends Route {
     if (!state || !state.quiz) throw new Error('Unknown quiz')
     const isHost = state.quiz?.host === userProfile.uuid
 
-    const sortedMembers = state.quiz?.members
-    .filter(uuid => profiles.has(uuid))
-    .sort((a: string, b: string) => {
-      if (!state || !state.quiz || !state.quiz.score) throw new Error('Unknown quiz')
-      return state.quiz.score[b] - state.quiz.score[a]
-    })
-
     let totalScore: {
-      [key: string]: {}
+      [key: string]: number
     } = {}
 
     for (const member of state.quiz.members) {
@@ -267,6 +260,11 @@ export default class Quiz extends Route {
       totalScore[member] = score
     }
 
+    const sortedMembers = state.quiz?.members
+    .filter(uuid => profiles.has(uuid))
+    .sort((a: string, b: string) => {
+      return totalScore[b] - totalScore[a]
+    })
 
     const highScore = totalScore[sortedMembers[0]]
 
@@ -315,7 +313,9 @@ export default class Quiz extends Route {
     if (!state.quiz) throw new Error('Unknown quiz')
     const question = state.quiz.questions?.[state.quiz.currentQuestion]
 
-    let everyOneHasAnswered = question && question.answers ? Object.keys(question.answers).length === state.quiz.members.length : false
+    const correctCount = question?.choices?.length ? question.choices.filter(choice => choice.correct).length : false
+
+    let everyOneHasAnswered = question && question.answers && correctCount ? Object.keys(question.answers).length === state.quiz.members.length && Object.values(question.answers).every(answers => answers.length === correctCount) : false
     if (!question?.choices) everyOneHasAnswered = true
 
     const previousQuestion = () => {
