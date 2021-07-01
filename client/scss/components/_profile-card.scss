@@ -7,6 +7,7 @@
   text-align: center;
   justify-content: center;
   flex-direction: column;
+  position: relative;
 
   .name {
     color: var(--profile-color);
@@ -32,6 +33,8 @@
   }  
 
   &.self {
+    z-index: 4;
+
     .avatar {   
       border: 3px solid rgba(0, 0, 0, .5);
     }

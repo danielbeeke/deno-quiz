@@ -7,7 +7,7 @@ import { goTo } from './goto';
 
 export const router = new UniversalRouter(routes, {
   errorHandler(error: Error) {
-
+    throw error
     if (error.message === 'Unknown quiz') goTo('home')
 
     return error.status === 404

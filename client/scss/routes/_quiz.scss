@@ -24,6 +24,7 @@
 
     .image {
       display: block;
+      transition: all .3s ease-in-out;
       max-height: calc(40vh);
       width: auto;
       max-width: 100%;
@@ -37,6 +38,7 @@
 
   .explainer {
     width: 100%;
+    margin-bottom: 20px;
 
     .inner {
       max-width: 500px;
@@ -79,6 +81,43 @@
   .right {
     margin-top: -25px;
     position: relative;
+  }
+
+  @media screen and (max-width: $tablet - 1px) {
+    .choices {
+      &.result {
+        gap: 20px;
+      }
+    }
+
+    .image.smaller {
+      max-height: 20vh;
+    }
+
+    .right {
+      margin-top: -15px;
+    }
+
+    .chosen-people {
+      position: relative;
+      z-index: 3;
+      gap: 0;
+      margin-top: -30px;
+
+      .user {
+        margin-right: -10px;
+
+        .avatar {
+          width: 40px;
+          height: 40px;  
+          font-size: 16px;
+        }
+
+        .name {
+          display: none;
+        }
+      }
+    }
   }
 }
 
@@ -153,6 +192,11 @@
 
     .explainer {
       font-size: 20px;
+      margin-bottom: 30px;
+    }
+
+    .has-people + .explainer {
+      margin-top: -30px;
     }
 
     .choices:not(.result) {

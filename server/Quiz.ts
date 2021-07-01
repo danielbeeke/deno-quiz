@@ -75,22 +75,6 @@ export class Quiz {
     }
     else {
       this.currentQuestion = -1
-      this.data.score = {}
-
-      for (const member of this.members) {
-        let score = 0
-  
-        for (const question of Object.values(this.data.questions)) {
-          const correctAnswers = question.choices.filter(choice => choice.correct === true)
-          for (const correctAnswer of correctAnswers) {
-            const correctIndex = correctAnswer ? question.choices.indexOf(correctAnswer) : null
-             if (correctIndex !== null && question.answers?.[member].includes(correctIndex)) score++  
-          }
-        }
-  
-        this.data.score[member] = score
-      }
-  
       this.state = 'done'
     }
     broadcast({

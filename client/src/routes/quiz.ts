@@ -12,6 +12,7 @@ import { t } from '../core/Translate'
 
 type QuizState = {
   quiz: QuizType | null
+  passwordTries: number
 }
 
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -23,7 +24,7 @@ export default class Quiz extends Route {
   protected quizPassword = ''
 
   async template (context: RouterContext) {
-    const state: QuizState = getState(this, { quiz: null })
+    const state: QuizState = getState(this, { quiz: null, passwordTries: 0 })
 
     try {
       const password = sessionStorage.getItem('quiz-' + context.params.name) ?? ''
@@ -31,6 +32,8 @@ export default class Quiz extends Route {
     }
     catch (exception) {
       if (exception === 'Password does not match') {
+        state.passwordTries++
+
         const gotoProtectedQuiz = (event: Event) => {
           event.preventDefault()
           sessionStorage.setItem('quiz-' + context.params.name, this.quizPassword)
@@ -51,13 +54,15 @@ export default class Quiz extends Route {
         <label>${t`Quiz password`}</label>
         <input type="text" onkeyup=${setQuizPassword} />
 
+        ${state.passwordTries > 1 ? html`<div class="error-message">${exception}</div>` : null}
+
         <button class="button primary">Enter quiz</button>
       </form>
         `
       }
     }
 
-    if (state?.quiz?.require_sharepoint && state?.quiz?.sharepoint_image) {
+    if (state?.quiz?.require_sharepoint && state?.quiz?.sharepoint_image && !localStorage.triedSharepoint) {
       const testImage = document.createElement('img')
       testImage.onerror = () => {
         if (!localStorage.triedSharepoint) {
@@ -184,7 +189,7 @@ export default class Quiz extends Route {
     <div class="header">
     <h1 class="page-title">${state.quiz.currentQuestion + 1}. ${question.title}</h1>
 
-    ${question?.image ? html`<img class="image" src=${question?.image} />` : null}
+    ${question?.image ? html`<img class="image smaller" src=${question?.image} />` : null}
     </div>
 
     ${question.choices ? html`
@@ -206,7 +211,7 @@ export default class Quiz extends Route {
             </span>
           </div>
           
-          <div class=${`right ${option.correct ? 'correct' : 'wrong'}`}>
+          <div class=${`right ${option.correct ? 'correct' : 'wrong'} ${chosenPeople.length ? 'has-people' : ''}`}>
             <div class="progress-bar" style=${`--progress: ${chosenPercentage}%`}>
               <span class="text">${chosenPercentage}%</span>
             </div>
@@ -244,7 +249,26 @@ export default class Quiz extends Route {
       return state.quiz.score[b] - state.quiz.score[a]
     })
 
-    const highScore = state.quiz.score[sortedMembers[0]]
+    let totalScore: {
+      [key: string]: {}
+    } = {}
+
+    for (const member of state.quiz.members) {
+      let score = 0
+
+      for (const question of Object.values(state.quiz.questions)) {
+        const correctAnswers = question.choices ? question.choices?.filter(choice => choice.correct === true) ?? [] : []
+        for (const correctAnswer of correctAnswers) {
+          const correctIndex = correctAnswer ? question.choices.indexOf(correctAnswer) : null
+           if (correctIndex !== null && question.answers?.[member].includes(correctIndex)) score++  
+        }
+      }
+
+      totalScore[member] = score
+    }
+
+
+    const highScore = totalScore[sortedMembers[0]]
 
     return html`
     <h1>${state.quiz.title} - ${state.quiz.questions.length} questions</h1>
@@ -252,12 +276,14 @@ export default class Quiz extends Route {
     <div class="members">
       ${sortedMembers.map(uuid => {
         const member = profiles.get(uuid)
-        if (!state || !state.quiz || !state.quiz.score) throw new Error('Unknown quiz')
-        const score = state.quiz.score[uuid]
+        if (!state || !state.quiz || !totalScore) throw new Error('Unknown quiz')
+        const score = totalScore[uuid]
 
         let totalPoints = 0
         for (const question of state.quiz.questions) {
-          totalPoints += question.choices.filter(choice => choice.correct).length
+          if (question.choices) {
+            totalPoints += question.choices.filter(choice => choice.correct).length
+          }
         }
 
         const correctPercentage = Math.round(100 / totalPoints * score)
@@ -272,7 +298,7 @@ export default class Quiz extends Route {
           <span class="name">${member?.name?.split(' ')[0]}</span>
         </div>
 
-            <span class="user-points">${state.quiz.score[uuid]} of ${totalPoints} points</span>
+            <span class="user-points">${totalScore?.[uuid]} of ${totalPoints} points</span>
   </div>
         <div class="progress-bar" style=${`--progress: ${correctPercentage}%`}></div>
         </div>
@@ -289,7 +315,8 @@ export default class Quiz extends Route {
     if (!state.quiz) throw new Error('Unknown quiz')
     const question = state.quiz.questions?.[state.quiz.currentQuestion]
 
-    const everyOneHasAnswered = question && question.answers ? Object.keys(question.answers).length === state.quiz.members.length : false
+    let everyOneHasAnswered = question && question.answers ? Object.keys(question.answers).length === state.quiz.members.length : false
+    if (!question?.choices) everyOneHasAnswered = true
 
     const previousQuestion = () => {
       if (!state.quiz) throw new Error('Unknown quiz')
