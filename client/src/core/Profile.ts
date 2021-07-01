@@ -9,6 +9,7 @@ class ProfileManager {
 
   constructor () {
     const profile = localStorage.profile ? JSON.parse(localStorage.profile) : false
+    if (profile.avatar) delete profile.avatar
 
     if (profile) {
       this.name = profile.name

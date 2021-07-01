@@ -5,6 +5,7 @@ import { RouterContext } from 'universal-router';
 import { connection } from '../core/connection'
 import { Quiz as QuizType } from '../types'
 import { getState } from '../helpers/getState'
+import { stringToColor } from '../helpers/stringToColor'
 import { Profile as userProfile, profiles } from '../core/Profile'
 import { goTo } from '../core/goto';
 import { t } from '../core/Translate'
@@ -59,7 +60,7 @@ export default class Quiz extends Route {
     if (state?.quiz?.require_sharepoint && state?.quiz?.sharepoint_image) {
       // window.location = state?.quiz?.require_sharepoint
       const testImage = document.createElement('img')
-      testImage.onerror = () => {
+      testImage.onerror = (error: Error) => {
         window.location.replace(state?.quiz?.require_sharepoint ?? '')
       }
 
@@ -113,11 +114,12 @@ export default class Quiz extends Route {
           .map(uuid => {
           const member = profiles.get(uuid)
 
-          return html`
-          <div class="profile card">
-            <h3 class="name">${member?.name}</h3>
-          </div>
-        `
+          return member ? html`
+            <div class="user" style=${`--profile-color: ${stringToColor(member.name)}`}>
+              <div class="avatar">${member.name.substr(0, 1)}</div>
+              <span class="name">${member?.name?.split(' ')[0]}</span>
+            </div>
+          ` : null
         })}
       </div>
 
@@ -170,48 +172,6 @@ export default class Quiz extends Route {
     `
   }
 
-  async controls (state: QuizState) {
-    if (!state.quiz) throw new Error('Unknown quiz')
-    const question = state.quiz.questions?.[state.quiz.currentQuestion]
-
-    const previousQuestion = () => {
-      if (!state.quiz) throw new Error('Unknown quiz')
-      connection.previousQuestion(state.quiz.room)
-    }
-
-    const nextQuestion = () => {
-      if (!state.quiz) throw new Error('Unknown quiz')
-      connection.nextQuestion(state.quiz.room)
-    }
-
-    const restartQuiz = () => {
-      if (confirm('Do you really want to restart the quiz for everyone?')) {
-        if (!state.quiz) throw new Error('Unknown quiz')
-        connection.restartQuiz(state.quiz.room)
-      }
-    }
-
-    const stopQuiz = async () => {
-      if (confirm('Do you really want to stop the quiz for everyone?')) {
-        if (!state.quiz) throw new Error('Unknown quiz')
-        await connection.stopQuiz(state.quiz.room)
-        goTo('home')  
-      }
-    }
-
-    const everyOneHasAnswered = question && question.answers ? Object.keys(question.answers).length === state.quiz.members.length : false
-
-    return html`
-      <div class="controls">
-      <button class="button mini secondary" onclick=${stopQuiz}>Stop quiz</button>
-        <button class="button mini secondary" onclick=${restartQuiz}>Restart quiz</button>
-        ${state.quiz.currentQuestion !== -1 ? html`<button onclick=${previousQuestion} class="button mini secondary">${'Previous question'}</button>` : null}
-        ${state.quiz.currentQuestion !== -1 ? html`<button onclick=${nextQuestion} class=${`button mini secondary ${everyOneHasAnswered ? 'active' : ''}`}>${state.quiz.questions.length === state.quiz.currentQuestion + 1 ? 'Finish quiz' : 'Next question'}</button>` : null}
-        
-      </div>
-    `
-  }
-
   async inBetweenScreen (state: QuizState) {
     if (!state || !state.quiz) throw new Error('Unknown quiz')
     const question = state.quiz.questions[state.quiz.currentQuestion]
@@ -250,7 +210,12 @@ export default class Quiz extends Route {
             </div>
             ${chosenPeople.length ? html`
               <div class="chosen-people">
-                ${chosenPeople.map(member => html`<div class=${`person ${member?.uuid === userProfile.uuid ? 'self' : ''}`}></div>`)}
+                ${chosenPeople.map(member => html`
+                <div class=${`user ${member?.uuid === userProfile.uuid ? 'self' : ''}`} style=${`--profile-color: ${stringToColor(member?.name ?? '')}`}>
+                  <div class="avatar">${member?.name.substr(0, 1)}</div>
+                  <span class="name">${member?.name?.split(' ')[0]}</span>
+                </div>
+              `)}
               </div>
             ` : null}
           </div>
@@ -313,4 +278,54 @@ export default class Quiz extends Route {
 
     `
   }
+
+  async controls (state: QuizState) {
+    if (!state.quiz) throw new Error('Unknown quiz')
+    const question = state.quiz.questions?.[state.quiz.currentQuestion]
+
+    const everyOneHasAnswered = question && question.answers ? Object.keys(question.answers).length === state.quiz.members.length : false
+
+    const previousQuestion = () => {
+      if (!state.quiz) throw new Error('Unknown quiz')
+      connection.previousQuestion(state.quiz.room)
+    }
+
+    const nextQuestion = () => {
+      if (!state.quiz) throw new Error('Unknown quiz')
+      if (!everyOneHasAnswered) {
+        if (confirm('Are you sure, not everyone has answered yet.')) {
+          connection.nextQuestion(state.quiz.room)
+        }
+      }
+      else {
+        connection.nextQuestion(state.quiz.room)
+      }
+    }
+
+    const restartQuiz = () => {
+      if (confirm('Do you really want to restart the quiz for everyone?')) {
+        if (!state.quiz) throw new Error('Unknown quiz')
+        connection.restartQuiz(state.quiz.room)
+      }
+    }
+
+    const stopQuiz = async () => {
+      if (confirm('Do you really want to stop the quiz for everyone?')) {
+        if (!state.quiz) throw new Error('Unknown quiz')
+        await connection.stopQuiz(state.quiz.room)
+        goTo('home')  
+      }
+    }
+
+    return html`
+      <div class="controls">
+      <button class="button mini secondary" onclick=${stopQuiz}>Stop quiz</button>
+        <button class="button mini secondary" onclick=${restartQuiz}>Restart quiz</button>
+        ${state.quiz.currentQuestion !== -1 ? html`<button onclick=${previousQuestion} class="button mini secondary">${'Previous question'}</button>` : null}
+        ${state.quiz.currentQuestion !== -1 ? html`<button onclick=${nextQuestion} class=${`button mini secondary ${everyOneHasAnswered ? 'active' : ''}`}>${state.quiz.questions.length === state.quiz.currentQuestion + 1 ? 'Finish quiz' : 'Next question'}</button>` : null}
+        
+      </div>
+    `
+  }
+
 }

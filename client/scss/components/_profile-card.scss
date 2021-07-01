@@ -1,28 +1,39 @@
-.profile.card {
+.user {
+  color: var(--profile-color);
+  text-decoration: none;
+  gap: 1px;
   display: flex;
-  position: relative;
-  max-width: 100px;
+  font-weight: bold;
+  text-align: center;
+  justify-content: center;
+  flex-direction: column;
 
   .name {
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: var(--color-primary);
-    background-color: white;
-    display: inline-block;
-    border-radius: 20px;
-    font-size: 16px;
-    padding: 6px 10px;
-    margin: 0;
+    color: var(--profile-color);
+    font-size: 13px;
   }
 
-  img {
-    width: 100px;
-    height: 100px;
+  .avatar {
+    display: flex;
     position: relative;
-    margin-inline: auto;
-    object-fit: cover;
+    width: 50px;
+    height: 50px;
+    background-color: var(--profile-color);
     border-radius: 50%;
+    margin: 0;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    line-height: 0;
+    font-size: 24px;
+    border: 3px solid rgba(0, 0, 0, .001);
+    align-self: center;
+    color: white;
   }  
+
+  &.self {
+    .avatar {   
+      border: 3px solid rgba(0, 0, 0, .5);
+    }
+  }
 }

@@ -59,8 +59,8 @@ async function handleWs(sock: WebSocket & { id?: string }) {
             resultMessage = createQuiz(jsonMessage.name, jsonMessage.data, jsonMessage.password, jsonMessage.uuid)
           }
 
-          if (jsonMessage.command === 'saveProfile' && jsonMessage.name && jsonMessage.avatar && jsonMessage.uuid) {
-            resultMessage = saveProfile(jsonMessage.name, jsonMessage.avatar, jsonMessage.uuid)
+          if (jsonMessage.command === 'saveProfile' && jsonMessage.name && jsonMessage.uuid) {
+            resultMessage = saveProfile(jsonMessage.name, jsonMessage.uuid)
           }
 
           if (jsonMessage.command === 'getQuizzes') {

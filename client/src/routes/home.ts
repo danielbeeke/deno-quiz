@@ -4,6 +4,8 @@ import { t } from '../core/Translate'
 import { Route } from './Route'
 import { connection } from '../core/connection'
 import { Profile as userProfile } from '../core/Profile'
+import FullScreenIcon from '../../images/fullscreen.svg?url'
+import { stringToColor } from '../helpers/stringToColor'
 
 export default class Home extends Route {
   public name = 'home'
@@ -34,11 +36,15 @@ export default class Home extends Route {
     return html`
       <h1>Welcome to ${config.name}!</h1>
 
-      <a href="/profile" class="profile card">
-        <h3 class="name">${userProfile.name}</h3>
+      <a href="/profile" class="user" style=${`--profile-color: ${stringToColor(userProfile.name)}`}>
+        <div class="avatar">
+          ${userProfile.name.substr(0, 1)}
+        </div>
+
+        <span class="name">${userProfile.name}</span>
       </a>
 
-      <a href="/profile" class="secondary button small">${t`Edit profile`}</a>
+      <a href="/profile" class="secondary button small">${t`Edit name`}</a>
 
       <hr>
 
@@ -54,7 +60,7 @@ export default class Home extends Route {
         <hr>
 
         <a class="button secondary small" onclick=${toggleFullscreen}>
-          <img onload="SVGInject(this)" src="/images/fullscreen.svg">
+          <img onload="SVGInject(this)" src=${FullScreenIcon}>
           ${document.fullscreenElement !== null ? t`Close fullscreen` : t`Make fullscreen`}
         </a>
 

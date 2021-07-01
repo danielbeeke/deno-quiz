@@ -28,7 +28,7 @@ export default class Profile extends Route {
         <label>${t`Your name`}</label>
         <input type="text" .value=${userProfile.name} onkeyup=${setProfileName} />
 
-        <button class="button primary">Save profile</button>
+        <button class="button primary">Save name</button>
 
       </form>
     `
