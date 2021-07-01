@@ -277,7 +277,7 @@ export default class Quiz extends Route {
       ${sortedMembers.map(uuid => {
         const member = profiles.get(uuid)
         if (!state || !state.quiz || !totalScore) throw new Error('Unknown quiz')
-        const score = totalScore[uuid]
+        const myScore = (totalScore[uuid] as number)
 
         let totalPoints = 0
         for (const question of state.quiz.questions) {
@@ -286,10 +286,10 @@ export default class Quiz extends Route {
           }
         }
 
-        const correctPercentage = Math.round(100 / totalPoints * score)
+        const correctPercentage = Math.round(100 / totalPoints * myScore)
 
         return html`
-        <div class="${`score-row correct ${highScore === score ? ' winner' : ''}`}">
+        <div class="${`score-row correct ${highScore === myScore ? ' winner' : ''}`}">
 
         <div class="top">
 
