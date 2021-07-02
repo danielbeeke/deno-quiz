@@ -1,11 +1,21 @@
-# TODO
+# Deno Quiz
 
-- On photo questions the photo should be bigger
-- Show how many possible answers?
-- Make it possible to kick a user
-- Show how many users have answered questions. For host.
-- Make it possible to goto next question always.
-- Make snapshot button was not clear.
-- In between score screens
-- In between screens with an image.
-- Add passport system
+This is a multi-player quiz. You can create your quiz in JSON and load it into the program.
+This software is easily deployable with fly.io or Docker.
+
+Features:
+
+- Multiple choices questions with one or more correct answers
+- In between screens with a youtube video or an image
+- Password protection on quizzes
+- Images within quizes are loaded via URLs
+- When having connectivity problems are it auto re-connects
+- You can have images inside the choices
+- You can have an image header for a question
+- Custom end screens with a video
+  
+## Tech
+
+This is built with TypeScript and WebSockets.
+The backend uses Deno.
+It has a DockerFile.

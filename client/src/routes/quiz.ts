@@ -9,10 +9,6 @@ import { stringToColor } from '../helpers/stringToColor'
 import { Profile as userProfile, profiles } from '../core/Profile'
 import { goTo } from '../core/goto';
 import { t } from '../core/Translate'
-/** @ts-ignore */
-import doneMobile from '../../images/done-mobile.mp4'
-/** @ts-ignore */
-import doneDesktop from '../../images/done-desktop.mp4'
 
 type QuizState = {
   quiz: QuizType | null
@@ -258,7 +254,7 @@ export default class Quiz extends Route {
         const correctAnswers = question.choices ? question.choices?.filter(choice => choice.correct === true) ?? [] : []
         for (const correctAnswer of correctAnswers) {
           const correctIndex = correctAnswer ? question.choices.indexOf(correctAnswer) : null
-           if (correctIndex !== null && question.answers?.[member].includes(correctIndex)) score++  
+           if (correctIndex !== null && question.answers?.[member]?.includes(correctIndex)) score++  
         }
       }
 
@@ -277,9 +273,7 @@ export default class Quiz extends Route {
 
     return html`
     <h1>${state.quiz.title} - ${state.quiz.questions.length} questions</h1>
-
-    <video class="background-video" loop autoplay src=${window.outerWidth < window.outerHeight ? doneMobile : doneDesktop} />
-
+    ${state.quiz.done_desktop && state.quiz.done_mobile ? html`<video class="background-video" loop autoplay src=${window.outerWidth < window.outerHeight ? state.quiz.done_mobile : state.quiz.done_desktop} />` : null }
     <div class="members">
       ${sortedMembers.map(uuid => {
         const member = profiles.get(uuid)

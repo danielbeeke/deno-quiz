@@ -1,5 +1,7 @@
 {
   "title": "Example Quiz",
+  "done_mobile": "https://emailnet.sharepoint.com/sites/Lit-MediaDepartment/Shared%20Documents/4_%20Media%20Distribution/2%20Media%20Exchange%20Platform/quiz//done-mobile.mp4",
+	"done_desktop": "https://emailnet.sharepoint.com/sites/Lit-MediaDepartment/Shared%20Documents/4_%20Media%20Distribution/2%20Media%20Exchange%20Platform/quiz//done-desktop.mp4",
   "questions": [
     {
       "title": "What is the capital of the Netherlands?",

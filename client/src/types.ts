@@ -17,6 +17,8 @@ export type Route = {
 export type Quiz = {
   state: string
   title: string
+  done_mobile?: string,
+  done_desktop?: string,
   require_sharepoint?: string
   sharepoint_image?: string
   host: string
