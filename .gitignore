@@ -5,3 +5,4 @@ dist-ssr
 *.local
 om.quiz.json
 client/images
+fly.toml
